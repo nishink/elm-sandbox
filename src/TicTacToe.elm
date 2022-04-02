@@ -8,7 +8,7 @@ import Browser
 import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (class, style)
 import Html.Events exposing (onClick)
-import Maybe exposing (Maybe)
+import Maybe
 
 
 
