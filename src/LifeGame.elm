@@ -65,7 +65,7 @@ height =
 -- VIEW
 
 
-view computer model =
+view _ model =
     drawPauseButton
         :: rectangle (rgb 240 240 240) windowWidth windowHeight
         :: List.map drawPos model.board
