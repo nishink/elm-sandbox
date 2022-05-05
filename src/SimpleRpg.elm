@@ -88,14 +88,26 @@ update msg model =
             { model | message = fought.message, player = fought.player, boss = fought.enemy }
 
 
+
+-- 回復する
+
+
 recover : Charactor -> Charactor
 recover charactor =
     { charactor | hp = charactor.maxHp }
 
 
+
+-- ダメージを与える
+
+
 hurt : Charactor -> Int -> Charactor
 hurt charactor damage =
     { charactor | hp = charactor.hp - damage }
+
+
+
+-- レベルアップ
 
 
 levelUp : Charactor -> Charactor
@@ -105,6 +117,10 @@ levelUp charactor =
         , attack = charactor.attack + 1
         , defence = charactor.defence + 1
     }
+
+
+
+-- ダメージ計算
 
 
 calcDamage : Charactor -> Charactor -> Int
@@ -120,6 +136,10 @@ calcDamage attacker defender =
         damage
 
 
+
+-- ダメージを与えたメッセージ
+
+
 msgDamage : Charactor -> Charactor -> Int -> String
 msgDamage attacker defender damage =
     attacker.name
@@ -128,6 +148,10 @@ msgDamage attacker defender damage =
         ++ "に"
         ++ String.fromInt damage
         ++ "のダメージ！\n"
+
+
+
+-- たたかう
 
 
 fight : BattleModel -> BattleModel
@@ -184,6 +208,10 @@ fight model =
                 }
 
 
+
+-- ザコ敵と戦う
+
+
 fightMonster : BattleModel -> BattleModel
 fightMonster model =
     let
@@ -199,6 +227,10 @@ fightMonster model =
 
     else
         fought
+
+
+
+-- ボス敵と戦う
 
 
 fightBoss : BattleModel -> BattleModel
@@ -233,6 +265,10 @@ view model =
         ]
 
 
+
+-- ステータス表示
+
+
 getStatus : Charactor -> String
 getStatus charactor =
     "HP:"
@@ -243,6 +279,10 @@ getStatus charactor =
         ++ String.fromInt charactor.attack
         ++ " 守備力:"
         ++ String.fromInt charactor.defence
+
+
+
+-- 改行文字をbrタグに置き換え
 
 
 linefeed : String -> List (Html msg)

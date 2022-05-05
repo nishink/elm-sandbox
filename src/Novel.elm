@@ -11,6 +11,7 @@ import Time
 -- MAIN
 
 
+main : Program () Model Msg
 main =
     Browser.document
         { init = init
@@ -31,6 +32,7 @@ type alias Model =
     }
 
 
+scenario : List String
 scenario =
     [ "ノベルゲームのように、一文字ずつ表示します。\n"
         ++ "改行もします。"
@@ -90,7 +92,7 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     -- 定期的にタイマー信号を発信
     Time.every 50 Telling
 
@@ -113,6 +115,7 @@ view model =
     }
 
 
+viewPrompt : Model -> List (Html Msg)
 viewPrompt model =
     -- テキストを表示し終わったらプロンプト「▷」を出す。
     if model.length >= String.length model.text then

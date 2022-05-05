@@ -279,6 +279,7 @@ survivors board =
 -- 生存判定（周囲の生存者が２か３）
 
 
+survive : Board -> Pos -> Bool
 survive board pos =
     let
         count =
@@ -291,6 +292,7 @@ survive board pos =
 -- 重複を削除(remove duplicates)
 
 
+rmdups : List a -> List a
 rmdups list =
     case list of
         [] ->
