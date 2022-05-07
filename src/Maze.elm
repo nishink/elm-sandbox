@@ -243,9 +243,9 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     div []
-        [ button [ onClick (Roll ( model.size, model.size )) ] [ text "create maze" ]
-        , button [ onClick (ChangeSize -2) ] [ text "size down" ]
-        , button [ onClick (ChangeSize 2) ] [ text "size up" ]
+        [ button [ style "font-size" "32px", onClick (Roll ( model.size, model.size )) ] [ text "再生成" ]
+        , button [ style "font-size" "32px", onClick (ChangeSize -2) ] [ text "小さく" ]
+        , button [ style "font-size" "32px", onClick (ChangeSize 2) ] [ text "大きく" ]
 
         --        , div [] (linefeed <| viewMaze model)
         , div [] [ viewMazeTable model ]
