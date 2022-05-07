@@ -26,14 +26,6 @@ main =
 -- MODEL
 
 
-width =
-    21
-
-
-height =
-    21
-
-
 wall =
     "#"
 
@@ -63,26 +55,35 @@ get2D ( x, y ) array =
         |> Array.get x
 
 
+getWidth : Array2D a -> Int
+getWidth array =
+    Array.get 0 array |> Maybe.withDefault Array.empty |> Array.length
+
+
+getHeight : Array2D a -> Int
+getHeight array =
+    Array.length array
+
+
 type alias Model =
     { map : Array2D String
+    , size : Int
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( initMaze
-    , generateRandomDirections
+    let
+        size =
+            33
+    in
+    ( Model (initMap size size) size
+    , generateRandomDirections size size
     )
 
 
-initMaze : Model
-initMaze =
-    { map = initMap
-    }
-
-
-initMap : Array2D String
-initMap =
+initMap : Int -> Int -> Array2D String
+initMap width height =
     Array.initialize height
         (\y ->
             Array.initialize width
@@ -108,26 +109,47 @@ type Direction
 
 
 type Msg
-    = Roll
+    = Roll ( Int, Int )
     | NewMaze ( List Direction, List Direction )
+    | ChangeSize Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Roll ->
-            ( model
-            , generateRandomDirections
+        Roll ( width, height ) ->
+            ( Model (initMap width height) model.size
+            , generateRandomDirections width height
             )
 
         NewMaze ( headLine, tailLine ) ->
-            ( { model | map = boutaoshi (List.append headLine tailLine) ( 2, 2 ) initMap }
+            let
+                width =
+                    getWidth model.map
+
+                height =
+                    getHeight model.map
+            in
+            ( { model | map = boutaoshi (List.append headLine tailLine) ( 2, 2 ) (initMap width height) }
             , Cmd.none
             )
 
+        ChangeSize size ->
+            let
+                n =
+                    if model.size + size > 3 then
+                        model.size + size
 
-generateRandomDirections : Cmd Msg
-generateRandomDirections =
+                    else
+                        3
+            in
+            ( { model | map = initMap n n, size = n }
+            , generateRandomDirections n n
+            )
+
+
+generateRandomDirections : Int -> Int -> Cmd Msg
+generateRandomDirections width height =
     let
         y =
             (height - 3) // 2
@@ -175,6 +197,12 @@ boutaoshi dirs ( x, y ) maze =
                             else
                                 set2D ( x, y + 1 ) wall maze
 
+                width =
+                    getWidth maze
+
+                height =
+                    getHeight maze
+
                 nextY =
                     if y + 2 >= height - 1 then
                         2
@@ -215,7 +243,9 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     div []
-        [ button [ onClick Roll ] [ text "create maze" ]
+        [ button [ onClick (Roll ( model.size, model.size )) ] [ text "create maze" ]
+        , button [ onClick (ChangeSize -2) ] [ text "size down" ]
+        , button [ onClick (ChangeSize 2) ] [ text "size up" ]
 
         --        , div [] (linefeed <| viewMaze model)
         , div [] [ viewMazeTable model ]
