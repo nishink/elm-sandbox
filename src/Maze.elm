@@ -57,7 +57,9 @@ get2D ( x, y ) array =
 
 getWidth : Array2D a -> Int
 getWidth array =
-    Array.get 0 array |> Maybe.withDefault Array.empty |> Array.length
+    Array.get 0 array
+        |> Maybe.withDefault Array.empty
+        |> Array.length
 
 
 getHeight : Array2D a -> Int
@@ -109,7 +111,7 @@ type Direction
 
 
 type Msg
-    = Roll ( Int, Int )
+    = Roll
     | NewMaze ( List Direction, List Direction )
     | ChangeSize Int
 
@@ -117,9 +119,13 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Roll ( width, height ) ->
-            ( Model (initMap width height) model.size
-            , generateRandomDirections width height
+        Roll ->
+            let
+                n =
+                    model.size
+            in
+            ( { model | map = initMap n n }
+            , generateRandomDirections n n
             )
 
         NewMaze ( headLine, tailLine ) ->
@@ -129,8 +135,11 @@ update msg model =
 
                 height =
                     getHeight model.map
+
+                randomList =
+                    List.append headLine tailLine
             in
-            ( { model | map = boutaoshi (List.append headLine tailLine) ( 2, 2 ) (initMap width height) }
+            ( { model | map = boutaoshi randomList ( 2, 2 ) (initMap width height) }
             , Cmd.none
             )
 
@@ -243,7 +252,7 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     div []
-        [ button [ style "font-size" "32px", onClick (Roll ( model.size, model.size )) ] [ text "再生成" ]
+        [ button [ style "font-size" "32px", onClick Roll ] [ text "再生成" ]
         , button [ style "font-size" "32px", onClick (ChangeSize -2) ] [ text "小さく" ]
         , button [ style "font-size" "32px", onClick (ChangeSize 2) ] [ text "大きく" ]
 
