@@ -66,7 +66,7 @@ height =
 
 
 view _ model =
-    drawPauseButton
+    drawPauseButton model
         :: rectangle (rgb 240 240 240) windowWidth windowHeight
         :: List.map drawPos model.board
 
@@ -92,12 +92,27 @@ drawPos ( x, y ) =
 -- 一時停止ボタン
 
 
-drawPauseButton : Shape
-drawPauseButton =
+drawPauseButton : Model -> Shape
+drawPauseButton model =
+    let
+        text =
+            if model.pause then
+                "RESUME"
+
+            else
+                "PAUSE"
+
+        color =
+            if model.pause then
+                lightRed
+
+            else
+                lightBlue
+    in
     group
-        [ rectangle lightBlue 256 64
+        [ rectangle color 300 64
             |> moveY (windowHeight * 0.5 + 64)
-        , words black "PAUSE"
+        , words black text
             |> scale 4
             |> moveY (windowHeight * 0.5 + 64)
         ]
