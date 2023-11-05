@@ -1,11 +1,18 @@
 module SimpleRpg exposing (..)
 
+{-| シンプルRPG。
+
+@docs init update view
+
+-}
+
 import Browser
 import Html exposing (Html, br, button, div, text)
 import Html.Events exposing (onClick)
 
 
 
+--------------------------------------------------------------------------------
 -- MAIN
 
 
@@ -15,33 +22,43 @@ main =
 
 
 
+--------------------------------------------------------------------------------
 -- MODEL
 
 
+{-| 状態を表す型の別名。
+-}
 type alias Model =
-    { message : String
-    , player : Charactor
-    , monster : Charactor
-    , boss : Charactor
+    { message : String -- 表示するメッセージ
+    , player : Charactor -- プレイヤー
+    , monster : Charactor -- モンスター
+    , boss : Charactor -- ボス
     }
 
 
+{-| キャラクターを表す型の別名。
+プレイヤー、モンスター、ボスをまとめて扱う。
+-}
 type alias Charactor =
-    { name : String
-    , hp : Int
-    , maxHp : Int
-    , attack : Int
-    , defence : Int
+    { name : String -- 名前
+    , hp : Int -- HP
+    , maxHp : Int -- 最大HP
+    , attack : Int -- 攻撃力
+    , defence : Int -- 守備力
     }
 
 
+{-| 戦闘中の状態を表す型の別名。
+-}
 type alias BattleModel =
-    { message : String
-    , player : Charactor
-    , enemy : Charactor
+    { message : String -- 表示するメッセージ
+    , player : Charactor -- プレイヤー
+    , enemy : Charactor -- 戦う相手（モンスターまたはボス）
     }
 
 
+{-| 初期状態。
+-}
 init : Model
 init =
     { message = ""
@@ -52,15 +69,21 @@ init =
 
 
 
+--------------------------------------------------------------------------------
 -- UPDATE
 
 
+{-| 更新処理の種類を表す型。
+いわゆるコマンド。
+-}
 type Msg
     = StayInn
     | FightMonster
     | FightBoss
 
 
+{-| 更新処理。
+-}
 update : Msg -> Model -> Model
 update msg model =
     case msg of
@@ -88,28 +111,22 @@ update msg model =
             { model | message = fought.message, player = fought.player, boss = fought.enemy }
 
 
-
--- 回復する
-
-
+{-| 回復する
+-}
 recover : Charactor -> Charactor
 recover charactor =
     { charactor | hp = charactor.maxHp }
 
 
-
--- ダメージを与える
-
-
+{-| ダメージを与える
+-}
 hurt : Charactor -> Int -> Charactor
 hurt charactor damage =
     { charactor | hp = charactor.hp - damage }
 
 
-
--- レベルアップ
-
-
+{-| レベルアップ
+-}
 levelUp : Charactor -> Charactor
 levelUp charactor =
     { charactor
@@ -119,10 +136,8 @@ levelUp charactor =
     }
 
 
-
--- ダメージ計算
-
-
+{-| ダメージ計算
+-}
 calcDamage : Charactor -> Charactor -> Int
 calcDamage attacker defender =
     let
@@ -136,10 +151,8 @@ calcDamage attacker defender =
         damage
 
 
-
--- ダメージを与えたメッセージ
-
-
+{-| ダメージを与えたメッセージ
+-}
 msgDamage : Charactor -> Charactor -> Int -> String
 msgDamage attacker defender damage =
     attacker.name
@@ -150,10 +163,8 @@ msgDamage attacker defender damage =
         ++ "のダメージ！\n"
 
 
-
--- たたかう
-
-
+{-| たたかう
+-}
 fight : BattleModel -> BattleModel
 fight model =
     -- プレイヤーが死んでいるとき
@@ -208,10 +219,8 @@ fight model =
                 }
 
 
-
--- ザコ敵と戦う
-
-
+{-| ザコ敵と戦う
+-}
 fightMonster : BattleModel -> BattleModel
 fightMonster model =
     let
@@ -229,10 +238,8 @@ fightMonster model =
         fought
 
 
-
--- ボス敵と戦う
-
-
+{-| ボス敵と戦う
+-}
 fightBoss : BattleModel -> BattleModel
 fightBoss model =
     if model.enemy.hp <= 0 then
@@ -251,9 +258,12 @@ fightBoss model =
 
 
 
+--------------------------------------------------------------------------------
 -- VIEW
 
 
+{-| 描画処理。
+-}
 view : Model -> Html Msg
 view model =
     div []
@@ -265,10 +275,8 @@ view model =
         ]
 
 
-
--- ステータス表示
-
-
+{-| ステータス表示
+-}
 getStatus : Charactor -> String
 getStatus charactor =
     "HP:"
@@ -281,10 +289,8 @@ getStatus charactor =
         ++ String.fromInt charactor.defence
 
 
-
--- 改行文字をbrタグに置き換え
-
-
+{-| 改行文字をbrタグに置き換え
+-}
 linefeed : String -> List (Html msg)
 linefeed message =
     String.lines message

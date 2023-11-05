@@ -1,5 +1,12 @@
 module HttpExamples exposing (..)
 
+{-| HTTPのサンプル。
+<https://guide.elm-lang.jp/effects/http.html>
+
+@docs main init update subscriptions view
+
+-}
+
 -- Make a GET request to load a book called "Public Opinion"
 --
 -- Read how it works:
@@ -12,9 +19,13 @@ import Http
 
 
 
+--------------------------------------------------------------------------------
 -- MAIN
 
 
+{-| エントリポイント。
+Browser.elementはコマンドとサブスクリプションを使って外の世界とやり取りができるSPAの雛形。
+-}
 main : Program () Model Msg
 main =
     Browser.element
@@ -26,15 +37,28 @@ main =
 
 
 
+--------------------------------------------------------------------------------
 -- MODEL
 
 
+{-| 状態を表す型。
+
+  - `Failure` 失敗
+  - `Loading` 読み込み中
+  - `Success` 成功（読み込んだ文字列）
+
+-}
 type Model
-    = Failure
-    | Loading
-    | Success String
+    = Failure -- 失敗
+    | Loading -- 読み込み中
+    | Success String -- 成功（読み込んだ文字列）
 
 
+{-| 状態の初期値。
+初期状態はLoading。
+Http.getを使って、指定したURLからテキストを取得する。
+取得時にGotTextメッセージを送信する。
+-}
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( Loading
@@ -46,13 +70,23 @@ init _ =
 
 
 
+--------------------------------------------------------------------------------
 -- UPDATE
 
 
+{-| 更新処理の種類を表す型を定義。
+
+  - `GotText` Result型を引数に取り、成功ならString、失敗ならHttp.Errorを返す。
+
+-}
 type Msg
     = GotText (Result Http.Error String)
 
 
+{-| 更新処理。
+メッセージを受けて状態を更新する。
+更新とともに、コマンドで新たなメッセージを送信する。
+-}
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg _ =
     case msg of
@@ -66,18 +100,26 @@ update msg _ =
 
 
 
+--------------------------------------------------------------------------------
 -- SUBSCRIPTIONS
 
 
+{-| 待受処理。
+このプログラムでは何もしない。
+-}
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.none
 
 
 
+--------------------------------------------------------------------------------
 -- VIEW
 
 
+{-| 描画処理。
+モデルの状態によって表示を切り替える。
+-}
 view : Model -> Html Msg
 view model =
     case model of

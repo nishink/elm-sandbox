@@ -12,6 +12,7 @@ import Html.Events exposing (..)
 
 
 
+--------------------------------------------------------------------------------
 -- MAIN
 
 
@@ -21,13 +22,20 @@ main =
 
 
 
+--------------------------------------------------------------------------------
 -- MODEL
 
 
+{-| 販売品。
+-}
 type alias Item =
-    { name : String, price : Int }
+    { name : String -- 品名
+    , price : Int -- 価格
+    }
 
 
+{-| 販売品リスト。
+-}
 itemData : List Item
 itemData =
     [ Item "こんぼう" 30
@@ -35,6 +43,8 @@ itemData =
     ]
 
 
+{-| 品名をキーに販売品リストから販売品を取得。
+-}
 getItem : String -> List Item -> Item
 getItem name list =
     let
@@ -45,14 +55,19 @@ getItem name list =
         |> Maybe.withDefault (Item "ダミー" 0)
 
 
+{-| 状態を表す型の別名。
+-}
 type alias Model =
-    { inventory : Dict String Int
-    , money : Int
-    , message : String
-    , command : List (Html Msg)
+    { inventory : Dict String Int -- 所持品（辞書型）、持っているアイテム名とその個数
+    , money : Int -- 所持金
+    , message : String -- 表示するメッセージ（武器屋の店主のセリフ）
+    , command : List (Html Msg) -- 表示するボタン（買う、売るなどのコマンド）
     }
 
 
+{-| 初期状態。
+所持品なし、所持金1000G。
+-}
 init : Model
 init =
     Model Dict.empty
@@ -61,22 +76,41 @@ init =
         initCommand
 
 
+{-| 最初のメッセージ。
+-}
 initMessage : String
 initMessage =
     "ここは武器の店だ。何か用かい？"
 
 
+{-| 最初のコマンド。
+-}
 initCommand : List (Html Msg)
 initCommand =
-    [ button [ onClick Buy ] [ text "買いに来た" ]
-    , button [ onClick Sell ] [ text "売りに来た" ]
+    [ commandButton [ onClick Buy ] [ text "買いに来た" ]
+    , commandButton [ onClick Sell ] [ text "売りに来た" ]
     ]
 
 
+{-| コマンドボタン。
+形状を統一するためのスタイルを指定。
+-}
+commandButton : List (Attribute msg) -> List (Html msg) -> Html msg
+commandButton attributes children =
+    button
+        (attributes
+            ++ [ style "width" "200px", style "height" "50px" ]
+        )
+        children
 
+
+
+--------------------------------------------------------------------------------
 -- UPDATE
 
 
+{-| 更新処理の種類を示す型。
+-}
 type Msg
     = Buy
     | BuyItem Item
@@ -89,6 +123,8 @@ type Msg
     | SellNo
 
 
+{-| 更新処理。
+-}
 update : Msg -> Model -> Model
 update msg model =
     case msg of
@@ -105,8 +141,8 @@ update msg model =
                 { model
                     | message = item.name ++ "は" ++ String.fromInt item.price ++ "ゴールドだよ。買うかい？"
                     , command =
-                        [ button [ onClick (BuyYes item) ] [ text "はい" ]
-                        , button [ onClick BuyNo ] [ text "いいえ" ]
+                        [ commandButton [ onClick (BuyYes item) ] [ text "はい" ]
+                        , commandButton [ onClick BuyNo ] [ text "いいえ" ]
                         ]
                 }
 
@@ -150,8 +186,8 @@ update msg model =
             { model
                 | message = item.name ++ "は" ++ price ++ "ゴールドで引き取るよ。それでいいかい？"
                 , command =
-                    [ button [ onClick (SellYes item) ] [ text "はい" ]
-                    , button [ onClick SellNo ] [ text "いいえ" ]
+                    [ commandButton [ onClick (SellYes item) ] [ text "はい" ]
+                    , commandButton [ onClick SellNo ] [ text "いいえ" ]
                     ]
             }
 
@@ -184,20 +220,26 @@ update msg model =
             { model | message = "他のものを売るかい？", command = itemList model.inventory }
 
 
+{-| 武器屋が売っているものの一覧を表示。
+「買いに来た」を選んだ時に表示する。
+-}
 sales : List Item -> List (Html Msg)
 sales items =
     List.append
         (List.map
             (\item ->
-                button
+                commandButton
                     [ onClick (BuyItem item) ]
                     [ text <| item.name ++ "(" ++ String.fromInt item.price ++ "G)" ]
             )
             items
         )
-        [ button [ onClick Init ] [ text "やめる" ] ]
+        [ commandButton [ onClick Init ] [ text "やめる" ] ]
 
 
+{-| 客が持っているものの一覧を表示。
+「売りに来た」を選んだ時に表示する。
+-}
 itemList : Dict String Int -> List (Html Msg)
 itemList inventory =
     List.append
@@ -208,18 +250,22 @@ itemList inventory =
                         item =
                             getItem k itemData
                     in
-                    button
+                    commandButton
                         [ onClick (SellItem item) ]
                         [ text <| k ++ "(" ++ String.fromInt item.price ++ "G)" ]
                 )
         )
-        [ button [ onClick Init ] [ text "やめる" ] ]
+        [ commandButton [ onClick Init ] [ text "やめる" ] ]
 
 
 
+--------------------------------------------------------------------------------
 -- VIEW
 
 
+{-| 描画処理。
+メッセージ（武器屋のセリフ）、コマンドボタン、所持金と所持品の一覧を表示。
+-}
 view : Model -> Html Msg
 view model =
     div []
@@ -229,11 +275,13 @@ view model =
         )
 
 
+{-| 所持金と所持品の一覧を表示。
+-}
 viewInventory : Model -> Html Msg
 viewInventory model =
     let
         tableStyle =
-            [ style "border" "1px solid gray" ]
+            [ style "border" "1px solid gray", style "width" "200px" ]
     in
     table tableStyle
         (List.append

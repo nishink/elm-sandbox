@@ -1,5 +1,12 @@
 module Clock exposing (..)
 
+{-| 時計のサンプル。
+<https://guide.elm-lang.jp/effects/time.html>
+
+@docs main init view update subscriptions
+
+-}
+
 -- Show the current time in your time zone.
 --
 -- Read how it works:
@@ -20,6 +27,7 @@ import Time
 
 
 
+--------------------------------------------------------------------------------
 -- MAIN
 
 
@@ -33,9 +41,12 @@ main =
 
 
 
+--------------------------------------------------------------------------------
 -- MODEL
 
 
+{-| 状態を表す型の別名。
+-}
 type alias Model =
     { zone : Time.Zone -- 使用するタイムゾーン
     , time : Time.Posix -- 1970年からの経過秒数
@@ -43,6 +54,8 @@ type alias Model =
     }
 
 
+{-| 初期状態。
+-}
 init : () -> ( Model, Cmd Msg )
 init _ =
     -- UTC, POSIX 0秒, 停止しない, を初期値とする
@@ -59,15 +72,20 @@ init _ =
 
 
 
+--------------------------------------------------------------------------------
 -- UPDATE
 
 
+{-| 更新処理の種類を表す型。
+-}
 type Msg
-    = Tick Time.Posix
-    | AdjustTimeZone Time.Zone
-    | Stop
+    = Tick Time.Posix -- チクタク。一秒進むごとに時計の描画を更新する。
+    | AdjustTimeZone Time.Zone -- タイムゾーンの調整。
+    | Stop -- 一時停止。
 
 
+{-| 更新処理。
+-}
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -85,22 +103,30 @@ update msg model =
 
 
 
+--------------------------------------------------------------------------------
 -- SUBSCRIPTIONS
 
 
+{-| 待受処理。
+-}
 subscriptions : Model -> Sub Msg
 subscriptions model =
     if model.stop then
         Sub.none
 
     else
+        -- 1000ミリ秒ごとにTick(表示時刻の更新)メッセージを発行。
         Time.every 1000 Tick
 
 
 
+--------------------------------------------------------------------------------
 -- VIEW
 
 
+{-| 描画処理。
+デジタル時計、アナログ時計、一時停止ボタンを表示。
+-}
 view : Model -> Html Msg
 view model =
     let
@@ -137,6 +163,8 @@ view model =
         ]
 
 
+{-| アナログ時計を表示。
+-}
 viewShape : Model -> Html Msg
 viewShape model =
     let
@@ -154,13 +182,16 @@ viewShape model =
         , width "400"
         , height "400"
         ]
-        [ circle [ cx "200", cy "200", r "120", fill "#1293D8" ] []
-        , viewHand 6 60 (hour / 12) "white"
-        , viewHand 6 90 (minute / 60) "white"
-        , viewHand 3 90 (second / 60) "red"
+        [ circle [ cx "200", cy "200", r "120", fill "#1293D8" ] [] -- 盤（文字のない文字盤）
+        , viewHand 6 60 (hour / 12) "white" -- 時針
+        , viewHand 6 90 (minute / 60) "white" -- 分針
+        , viewHand 3 90 (second / 60) "red" -- 秒針
         ]
 
 
+{-| 時計の針を描画。
+針の太さ、長さ、向き、色を指定。
+-}
 viewHand : Int -> Float -> Float -> String -> Svg msg
 viewHand width length turns color =
     let

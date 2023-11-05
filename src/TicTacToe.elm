@@ -1,5 +1,12 @@
 module TicTacToe exposing (..)
 
+{-| ３目並べ。
+ReactのチュートリアルをElmで実装。
+
+@docs init update view
+
+-}
+
 -- Tic Tac Toe - React Tutorial
 -- https://ja.reactjs.org/tutorial/tutorial.html
 
@@ -9,9 +16,11 @@ import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (class, style)
 import Html.Events exposing (onClick)
 import Maybe
+import Set exposing (fromList, toList)
 
 
 
+--------------------------------------------------------------------------------
 -- MAIN
 
 
@@ -21,15 +30,20 @@ main =
 
 
 
+--------------------------------------------------------------------------------
 -- MODEL
 
 
+{-| 状態。
+-}
 type alias Model =
     { squares : Array String
     , xIsNext : Bool
     }
 
 
+{-| 初期状態。
+-}
 init : Model
 init =
     { squares = Array.initialize 9 (always "")
@@ -38,27 +52,36 @@ init =
 
 
 
+--------------------------------------------------------------------------------
 -- UPDATE
 
 
+{-| 更新処理の種類。
+-}
 type Msg
     = Click Int
 
 
+{-| 更新処理。
+-}
 update : Msg -> Model -> Model
 update msg model =
     case msg of
         Click index ->
             if calculateWinner model.squares /= "" || get index model.squares /= "" then
+                -- 勝敗が決している場合か、すでに何か入っている場合は変更しない。
                 model
 
             else
+                -- 先手か後手に合わせてマルバツを設定し、手番を入れ替える。
                 { model
                     | squares = Array.set index (next model) model.squares
                     , xIsNext = not model.xIsNext
                 }
 
 
+{-| 次の手番。
+-}
 next : Model -> String
 next model =
     if model.xIsNext then
@@ -69,10 +92,13 @@ next model =
 
 
 
+--------------------------------------------------------------------------------
 -- VIEW
 -- tag [attributes] [child elements]
 
 
+{-| 表示処理。
+-}
 view : Model -> Html Msg
 view model =
     let
@@ -108,6 +134,9 @@ view model =
         ]
 
 
+{-| 四角いボタンを表示。
+クリックしたら、クリックした場所を送信。
+-}
 squareButton : Int -> Model -> Html Msg
 squareButton index model =
     button
@@ -120,22 +149,50 @@ squareButton index model =
         [ text (get index model.squares) ]
 
 
+{-| 文字列配列から値を取得。
+取得失敗時は空文字列を返す。
+-}
 get : Int -> Array String -> String
 get index array =
     Maybe.withDefault "" (Array.get index array)
 
 
+{-| 勝利判定。
+縦横斜めのいずれかにマルかバツが３つ並んだら、並んでいるものを返す。
+並んでなければ空文字列を返す。
+-}
 calculateWinner : Array String -> String
 calculateWinner squares =
     let
         lines =
-            [ ( 0, 1, 2 ), ( 3, 4, 5 ), ( 6, 7, 8 ), ( 0, 3, 6 ), ( 1, 4, 7 ), ( 2, 5, 8 ), ( 0, 4, 8 ), ( 2, 4, 6 ) ]
+            [ ( 0, 1, 2 )
+            , ( 3, 4, 5 )
+            , ( 6, 7, 8 )
+            , ( 0, 3, 6 )
+            , ( 1, 4, 7 )
+            , ( 2, 5, 8 )
+            , ( 0, 4, 8 )
+            , ( 2, 4, 6 )
+            ]
 
         calc ( a, b, c ) =
-            if get a squares /= "" && get a squares == get b squares && get a squares == get c squares then
-                get a squares
+            let
+                aa =
+                    get a squares
+
+                bb =
+                    get b squares
+
+                cc =
+                    get c squares
+            in
+            if aa /= "" && aa == bb && aa == cc then
+                aa
 
             else
                 ""
     in
-    String.concat (List.map calc lines)
+    List.map calc lines
+        |> Set.fromList
+        |> Set.toList
+        |> String.concat

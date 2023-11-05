@@ -23,7 +23,7 @@ main =
 -- VIEW
 
 
-view computer memory =
+view computer _ =
     [ circle lightPurple 15
         |> moveX computer.mouse.x
         |> moveY computer.mouse.y
@@ -41,5 +41,5 @@ view computer memory =
 -- UPDATE
 
 
-update computer memory =
+update _ memory =
     memory

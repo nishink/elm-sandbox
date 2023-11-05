@@ -13,7 +13,7 @@ main =
 
 
 
----------
+------------------------------------------------------------------------
 -- MODEL
 
 
@@ -81,7 +81,7 @@ height =
 
 
 
---------
+------------------------------------------------------------------------
 -- VIEW
 
 
@@ -139,7 +139,7 @@ drawPauseButton model =
 
 
 
-----------
+------------------------------------------------------------------------
 -- UPDATE
 
 
@@ -234,10 +234,6 @@ clickCell pos board =
         board
 
 
-
---
-
-
 {-| 生存判定
 pがbの要素であれば生存と判定
 -}
@@ -258,38 +254,6 @@ isEmpty board pos =
 wrap : Pos -> Pos
 wrap ( x, y ) =
     ( mod x width, mod y height )
-
-
-
--- Number型に使える整数の割り算がないので自作
-
-
-{-| Number型に対する割り算の剰余
--}
-mod : Number -> Number -> Number
-mod x y =
-    if x < 0 then
-        mod (x + y) y
-
-    else if x < y then
-        x
-
-    else
-        mod (x - y) y
-
-
-{-| Number型に対する割り算の商
--}
-div : Number -> Number -> Number
-div x y =
-    if x < 0 then
-        -1 + div (x + y) y
-
-    else if x < y then
-        0
-
-    else
-        1 + div (x - y) y
 
 
 {-| 周囲８方向を取得
@@ -335,6 +299,50 @@ survive board pos =
     count == 2 || count == 3
 
 
+{-| 現在の状態から誕生するものを抽出
+-}
+births : Board -> List Pos
+births board =
+    List.concatMap neighbors board
+        |> rmdups
+        |> List.filter (\p -> isEmpty board p)
+        |> List.filter (\p -> liveneighbors board p == 3)
+
+
+
+------------------------------------------------------------------------
+-- UTILITY
+-- Number型に使える整数の割り算がないので自作
+
+
+{-| Number型に対する割り算の剰余
+-}
+mod : Number -> Number -> Number
+mod x y =
+    if x < 0 then
+        mod (x + y) y
+
+    else if x < y then
+        x
+
+    else
+        mod (x - y) y
+
+
+{-| Number型に対する割り算の商
+-}
+div : Number -> Number -> Number
+div x y =
+    if x < 0 then
+        -1 + div (x + y) y
+
+    else if x < y then
+        0
+
+    else
+        1 + div (x - y) y
+
+
 {-| 重複を削除(remove duplicates)
 -}
 rmdups : List a -> List a
@@ -345,13 +353,3 @@ rmdups list =
 
         x :: xs ->
             x :: rmdups (List.filter (\y -> y /= x) xs)
-
-
-{-| 現在の状態から誕生するものを抽出
--}
-births : Board -> List Pos
-births board =
-    List.concatMap neighbors board
-        |> rmdups
-        |> List.filter (\p -> isEmpty board p)
-        |> List.filter (\p -> liveneighbors board p == 3)

@@ -1,5 +1,11 @@
 module Novel exposing (main)
 
+{-| ノベルゲーム。
+
+@docs init view update subscriptions
+
+-}
+
 import Browser exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -8,9 +14,13 @@ import Time
 
 
 
+--------------------------------------------------------------------------------
 -- MAIN
 
 
+{-| エントリポイント。
+Browser.documentは画面全体を操作する。HTML headやbodyの内容も変更できる。
+-}
 main : Program () Model Msg
 main =
     Browser.document
@@ -22,16 +32,21 @@ main =
 
 
 
+--------------------------------------------------------------------------------
 -- MODEL
 
 
+{-| 状態。
+-}
 type alias Model =
-    { scenario : List String
-    , text : String
-    , length : Int
+    { scenario : List String -- 文章データ（残り）
+    , text : String -- 表示する文字列
+    , length : Int -- 表示する長さ
     }
 
 
+{-| 文章データ。
+-}
 scenario : List String
 scenario =
     [ "ノベルゲームのように、一文字ずつ表示します。\n"
@@ -41,6 +56,9 @@ scenario =
     ]
 
 
+{-| 初期状態。
+文章データの最初の文章を取り出して表示対象に設定する。
+-}
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( Model
@@ -52,14 +70,19 @@ init _ =
 
 
 
+--------------------------------------------------------------------------------
 -- UPDATE
 
 
+{-| 更新処理の種類。
+-}
 type Msg
     = Telling Time.Posix
     | Prompt
 
 
+{-| 更新処理。
+-}
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -76,7 +99,7 @@ update msg model =
             , Cmd.none
             )
 
-        -- TODO ボタンを押したら次のメッセージの表示を始める
+        -- ボタンを押したら次のメッセージの表示を始める
         Prompt ->
             ( { model
                 | scenario = Maybe.withDefault [] <| List.tail model.scenario
@@ -88,9 +111,12 @@ update msg model =
 
 
 
+--------------------------------------------------------------------------------
 -- SUBSCRIPTIONS
 
 
+{-| 待受処理。
+-}
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     -- 定期的にタイマー信号を発信
@@ -98,9 +124,12 @@ subscriptions _ =
 
 
 
+--------------------------------------------------------------------------------
 -- VIEW
 
 
+{-| 描画処理。
+-}
 view : Model -> Document Msg
 view model =
     { title = "Novel Game"
@@ -115,6 +144,8 @@ view model =
     }
 
 
+{-| 次のページを表示するためのプロンプト（いわゆる次へボタン）を表示する。
+-}
 viewPrompt : Model -> List (Html Msg)
 viewPrompt model =
     -- テキストを表示し終わったらプロンプト「▷」を出す。

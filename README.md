@@ -9,6 +9,9 @@ haskellに似た文法で、動的なWebサイトが作れる。
 機能を制限しており、覚えることが少ない。  
 エラーメッセージがとても親切。
 
+### 基本的な文法
+https://elm-lang.org/docs/syntax
+
 ### 参考文献
 - [Elm開発環境について](https://qiita.com/sand/items/9afaef65c6f1ebf453da)
 - [初心者のElm入門](https://zenn.dev/lfz/articles/d97df2e89eae0b)
@@ -187,5 +190,106 @@ $ npm install elm
 [2023.1.9追記]
 
 $ elm install elm/http
+
+
+## コメントの書き方
+
+[Elmのコメント記法について調べてみた](https://qiita.com/Atzz/items/641b5d4548d4ffa1827e)
+
+```Elm
+-- 単行コメント
+```
+
+```Elm
+{-
+複数行
+コメント
+-}
+```
+
+```Elm
+{-| 関数へのコメント
+最初の行は{-|のあとにスペースを入れてコメントを記述する。
+次の行からは行頭からスペースなしで記述する。
+
+    使用例はスペース４つあけて記述する。
+-}
+```
+
+```Elm
+{-| モジュールへのコメント
+ここに関数の説明と同様に、モジュールの概要やサマリーを記載します。
+モジュール内で記載されている関数等に関しては以下にカテゴライズして記載します。
+
+# カテゴリー1
+
+@docs func1
+
+
+# カテゴリー2
+
+@docs func2 func3
+
+-}
+```
+
+
+## 他の言語をやってると忘れるElm独特の文法
+
+### 「:」と「::」
+
+Elmは型注釈が「:」で、リストの先頭要素追加が「::」。  
+Haskellは型注釈が「::」で、リストの先頭要素追加が「:」。
+
+```Elm
+-- Elm
+True : Bool
+1 :: [2,3,4]
+```
+
+```Haskell
+-- Haskell
+True :: Bool
+1 : [2,3,4]
+```
+
+### パイプライン演算子「|>」
+
+```Elm
+-- BEFORE
+sanitize : String -> Maybe Int
+sanitize input =
+  String.toInt (String.trim input)
+```
+
+```Elm
+-- AFTER
+sanitize : String -> Maybe Int
+sanitize input =
+  input
+    |> String.trim
+    |> String.toInt
+```
+
+### 制約付き型変数
+[型を読む](https://guide.elm-lang.jp/types/reading_types.html)より引用。
+
+```Elm
+negate : number -> number
+```
+- numberにはIntかFloatを当てはめられます
+- appendableにはStringかList aを当てはめられます
+- comparableにはIntかFloat,Char,String,そしてcomparableな値で構成されるリストまたはタプルを当てはめられます
+- compappendにはStringかList comparableを当てはめられます
+
+## HakellにあってElmにないもの
+
+条件分岐は if then else か case of しかない。パターンマッチとガードはない。
+
+[Haskellで比較/判定を行う4つの方法(if/case/パターンマッチ/ガード)](https://zenn.dev/masahiro_toba/articles/39aa954f402e27)
+
+let in はあるが、where はない。
+
+[let、whereはなぜ必要か？【Haskellにおける局所的な変数】](https://zenn.dev/masahiro_toba/articles/7a60ea19b08208)
 
 

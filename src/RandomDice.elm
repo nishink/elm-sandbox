@@ -7,6 +7,13 @@
 
 module RandomDice exposing (..)
 
+{-| 乱数のサンプル。
+<https://guide.elm-lang.jp/effects/random.html>
+
+@docs main init update subscriptions view
+
+-}
+
 import Browser
 import Html exposing (..)
 import Html.Events exposing (..)
@@ -17,9 +24,13 @@ import Tuple
 
 
 
+--------------------------------------------------------------------------------
 -- MAIN
 
 
+{-| エントリポイント。
+Browser.elementはコマンドとサブスクリプションを使って外の世界とやり取りができるSPAの雛形。
+-}
 main : Program () Model Msg
 main =
     Browser.element
@@ -31,9 +42,12 @@ main =
 
 
 
+--------------------------------------------------------------------------------
 -- MODEL
 
 
+{-| サイコロの１〜６の面を表す型。
+-}
 type Face
     = One
     | Two
@@ -43,12 +57,19 @@ type Face
     | Six
 
 
+{-| 状態を表す型の別名。
+２つのサイコロをレコードで保持。
+-}
 type alias Model =
     { diceFace1 : Face
     , diceFace2 : Face
     }
 
 
+{-| 状態の初期値。
+初期状態はサイコロの目がそれぞれ１、２。
+実行するコマンドは特になし。
+-}
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( Model One Two
@@ -57,20 +78,32 @@ init _ =
 
 
 
+--------------------------------------------------------------------------------
 -- UPDATE
 
 
+{-| 更新処理の種類を表す型を定義。
+
+    - `Roll` サイコロを転がす。
+    - `NewFace` 新しい面を表示する。
+
+-}
 type Msg
     = Roll
     | NewFace ( Face, Face )
 
 
+{-| 更新処理。
+メッセージを受けて状態を更新する。
+更新とともに、コマンドで新たなメッセージを送信する。
+-}
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Roll ->
             ( model
             , Random.generate NewFace
+                -- 乱数を生成し、新しい面を表示する状態へ移行する。
                 (Random.pair
                     -- 出目の均等なサイコロ
                     (Random.uniform One [ Two, Three, Four, Five, Six ])
@@ -88,24 +121,34 @@ update msg model =
             )
 
         NewFace newFace ->
+            -- 生成した乱数をそれぞれサイコロの目として設定する。
             ( Model (Tuple.first newFace) (Tuple.second newFace)
             , Cmd.none
             )
 
 
 
+--------------------------------------------------------------------------------
 -- SUBSCRIPTIONS
 
 
+{-| 待受処理。
+このプログラムでは何もしない。
+-}
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.none
 
 
 
+--------------------------------------------------------------------------------
 -- VIEW
 
 
+{-| 描画処理。
+サイコロの状態をテキストにした文字列と、サイコロを表示。
+サイコロを転がすボタンを表示。
+-}
 view : Model -> Html Msg
 view model =
     div []
@@ -116,13 +159,12 @@ view model =
         ]
 
 
-
--- サイコロをsvgで描画
-
-
+{-| サイコロをsvgで描画
+-}
 diceShape : Face -> Html msg
 diceShape diceFace =
     let
+        -- 出目の形状
         eye =
             case diceFace of
                 One ->
@@ -164,6 +206,7 @@ diceShape diceFace =
                     ]
     in
     svg
+        -- SVGの属性については https://developer.mozilla.org/ja/docs/Web/SVG を参照。
         [ width "120", height "120", viewBox "0 0 120 120" ]
         (rect
             [ x "10", y "10", width "100", height "100", rx "5", ry "5", fill "white", stroke "black", strokeWidth "2" ]
