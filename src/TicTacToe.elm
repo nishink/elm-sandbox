@@ -16,7 +16,7 @@ import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (class, style)
 import Html.Events exposing (onClick)
 import Maybe
-import Set exposing (fromList, toList)
+import Set
 
 
 
@@ -192,6 +192,7 @@ calculateWinner squares =
             else
                 ""
     in
+    -- 一度Setに置き換えることで重複を削除
     List.map calc lines
         |> Set.fromList
         |> Set.toList
