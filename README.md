@@ -253,7 +253,7 @@ True :: Bool
 1 : [2,3,4]
 ```
 
-### パイプライン演算子「|>」
+### パイプライン演算子「|>」「<|」
 
 ```Elm
 -- BEFORE
@@ -269,6 +269,29 @@ sanitize input =
   input
     |> String.trim
     |> String.toInt
+```
+
+```Elm
+--- このように書くこともできる。Haskellでいうところの $ みたいなもの。
+sanitize : String -> Maybe Int
+sanitize input =
+  String.toInt <| String.trim <| input
+```
+
+### 関数合成「<<」「>>」
+
+```Elm
+-- String.toIntとString.trimの合成
+sanitize : String -> Maybe Int
+sanitize input =
+  String.toInt << String.trim <| input
+```
+
+```Elm
+-- 逆向きの合成
+sanitize : String -> Maybe Int
+sanitize input =
+  input |> String.trim >> String.toInt
 ```
 
 ### 制約付き型変数
